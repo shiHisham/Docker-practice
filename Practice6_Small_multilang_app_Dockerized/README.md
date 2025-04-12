@@ -17,7 +17,6 @@ It is a **3-tier web application** where all components have been **fully Docker
 - **PostgreSQL Database**: Dockerized relational database.
 
 All services are orchestrated using **Docker Compose**.
----
 
 ## Architecture
 
@@ -45,3 +44,5 @@ All services are orchestrated using **Docker Compose**.
    docker-compose up --build
    ```
    This command will build the Docker images for all services and start the containers.
+
+---
