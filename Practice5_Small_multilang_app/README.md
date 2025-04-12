@@ -1,55 +1,57 @@
-[Home](../README.md) | [History and Motivation](../01-history-and-motivation/README.md)
-| [Technology Overview](../02-technology-overview/README.md)
-| [Installation and Set Up](../03-installation-and-set-up/README.md)
-| [Using 3rd Party Containers](../04-using-3rd-party-containers/README.md)
-| [Example Web Application](../05-example-web-application/README.md)
-| [Building Container Images](../06-building-container-images/README.md)
-| [Container Registries](../07-container-registries/README.md)
-| [Running Containers](../08-running-containers/README.md)
-| [Container Security](../09-container-security/README.md)
-| [Interacting with Docker Objects](../10-interacting-with-docker-objects/README.md)
-| [Development Workflows](../11-development-workflow/README.md)
-| [Deploying Containers](../12-deploying-containers/README.md)
+# Practice 5 - Small Multi-Language App (Partially Dockerized)
+
+## About This Practice
+
+This practice is based on a project from [DevOps Directive Docker Course](https://github.com/sidpalas/devops-directive-docker-course/tree/main/05-example-web-application).
+
+It is a simple **3-tier web application** composed of:
+
+- **React frontend**: A web client built with React and Vite.
+- **Node.js API**: Backend API developed with Express.js.
+- **Golang API**: Backend API developed with Go.
+- **PostgreSQL Database**: A relational database.
+
+In this version, **only the PostgreSQL database** was Dockerized.  
+The frontend and backend services (React, Node.js, and Go) were launched **locally** on the host machine.
 
 ---
 
-# Sample web application
+## Architecture
 
-![](./readme-assets/app-screenshot.png)
+- **Frontend** (React) ➔ communicates with ➔ **Node.js API** and **Golang API**
+- **APIs** ➔ fetch data from ➔ **PostgreSQL** (running inside Docker)
 
-## Minimal 3 tier web application
-- **React frontend:** Uses react query to load data from the two apis and display the result
-- **Node JS and Golang APIs:** Both have `/` and `/ping` endpoints. `/` queries the Database for the current time, and `/ping` returns `pong`
-- **Postgres Database:** An empty PostgreSQL database with no tables or data. Used to show how to set up connectivity. The API applications execute `SELECT NOW() as now;` to determine the current time to return.
+---
 
-![](./readme-assets/tech-stack.png)
+## Technologies Used
 
-## Running the Application
+- React
+- Node.js
+- Golang
+- PostgreSQL (Dockerized)
 
-While the whole point of this course is that you probably won't want/need to run the application locally (See: `11-development-workflow`), we can do so as a starting point.
+---
 
-The `Makefile` contains the commands to start each application.
+## How to Run the Project (Practice 5)
 
-### Postgres
+1. **Start PostgreSQL in Docker:**
+   Follow Makefile instructions to run PostgreSQL in a Docker container. This will set up the database for the APIs to connect to.
 
-It's way more convenient to run postgres in a container as we saw in `04-using-3rd-party-containers`, so we will do that.
+2. **Run Node.js API:**
+   - Navigate to the `api-node` directory.
+   - Install dependencies using `npm install`.
+   - Start the API using `make run-api-node`.
 
-`make run-postgres` will start postgres in a container and publish port 5432 from the container to your localhost.
+3. **Run Golang API:**
+   - Navigate to the `api-golang` directory.
+   - Install dependencies using `go mod download`.
+   - Start the API using `make run-api-golang`.
 
-### api-node
+4. **Run React Frontend:**
+   - Navigate to the `client-react` directory.
+   - Install dependencies using `npm install`.
+   - Start the frontend using `make run-client-react`.
 
-To run the node api you will need to run `npm install` to install the dependencies (I used node `v19.4.0` and npm `v9.2.0`).
-
-After installing the dependencies, `make run-api-node` will run the api in development mode with nodemon for restarting the app when you make source code changes.
-
-### api-golang 
-
-To run the golang api you will need to run `go mod download` to download and install the dependencies (I used `go1.19.1`)
-
-After installing the dependencies, `make run-api-golang` will build and run the api.
-
-### client-react
-
-Like `api-node`, you will first need to install the dependencies with `npm install` (again, I used node `v19.4.0` and npm `v9.2.0`)
-
-After installing the dependencies, `make run-client-react` will use vite to run the react app in development mode.
+5. **Access the Application:**
+   - Open your web browser and navigate to `http://localhost:3000` to access the React frontend.
+    - The frontend will communicate with the Node.js and Golang APIs to fetch data from the PostgreSQL database.

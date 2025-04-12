@@ -1,0 +1,40 @@
+# docker-compose.yaml file for a multi-language application with Node.js, Go, and React + PostgreSQL database
+
+services:
+  db:
+    image: postgres:15.1-alpine
+    environment:
+      POSTGRES_PASSWORD: foobarbaz
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  node:
+    build: ./api-node
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:foobarbaz@db:5432/postgres
+
+  golang:
+    build: ./api-golang
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:foobarbaz@db:5432/postgres
+
+  react:
+    build: ./client-react
+    ports:
+      - "1515:1516"
+    depends_on:
+      - node
+      - golang
+      
+volumes:
+  pgdata:
