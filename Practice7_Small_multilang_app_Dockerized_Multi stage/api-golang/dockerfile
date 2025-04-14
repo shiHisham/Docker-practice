@@ -1,12 +1,29 @@
 # Use multi-stage builds to optimize the final image size and security
+
 # ----------------------------------------------------------- Stage 1: Create base image, use alpine for smaller size
-FROM golang:1.20-alpine AS base
-# Install Git and certs for module downloads and HTTPS
-RUN apk add --no-cache git ca-certificates
+FROM golang:1.23-alpine AS base
+
+# Add environment variables for Go modules and CGO To avoid issues with module downloads and CGO
+# CGO_ENABLED=1 is used to enable CGO, which is necessary for some Go packages that require C libraries
+# GO111MODULE=on is used to enable Go modules, which is the dependency management system for Go
+# GOOS=linux is used to set the target operating system to Linux, which is important for cross-compilation
+# These environment variables are set to ensure that the Go application can be built and run correctly in the container
+ENV CGO_ENABLED=1
+ENV GO111MODULE=on
+ENV GOOS=linux
+
+# cgo: C compiler "gcc" not found: exec: "gcc": executable file not found in $PATH
+# Install gcc and musl-dev for C library support, which is required for some Go packages
+RUN apk add --no-cache gcc musl-dev
+# Install git for Go modules that require git to download dependencies
+RUN apk add --no-cache git
+
 # Working directory for the application
 WORKDIR /app
+
 # Copy go.mod and go.sum first, because they are less likely to change and will allow us to cache the dependencies
 COPY go.mod go.sum ./
+
 # Cache Go modules to speed up builds
 # target1 is the cache directory for Go modules, target2 is the cache directory for Go build
 RUN --mount=type=cache,target=/go/pkg/mod \
@@ -18,12 +35,16 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 # ----------------------------------------------------------- Stage 2: Development stage
 # This stage is used for development purposes only
 # To use this stage, run the following command: docker build --target dev -t api-go-dev && docker run -it --rm api-go-dev
+
 FROM base AS dev
+
 # Install Air for hot reload and Delve for debugging
-RUN go install github.com/cosmtrek/air@v1.40.4 && \
-    go install github.com/go-delve/delve/cmd/dlv@v1.9.1
+RUN go install github.com/air-verse/air@latest && \
+    go install github.com/go-delve/delve/cmd/dlv@latest
+
 # Copy air, delve, and other necessary files into the container
 COPY . .
+
 # use air for hot reload command
 CMD ["air", "-c", ".air.toml"]
 
@@ -51,7 +72,14 @@ FROM scratch
 # ENV GIN_MODE=release, which is used to set the Gin framework to release mode
 # This is important for performance and security in production
 ENV GIN_MODE=release
-# Working directory for the application
+# ENV DATABASE=postgres://user:password@host:port/dbname?sslmode=disable
+# # ENV DATABASE=postgres://user:password@host:port/dbname?sslmode=disable
+# # About security this approach of env and set database connection string is not recommended
+# # because it exposes sensitive information in the image. 
+# # A better approach would be to use Docker secrets or environment variables at runtime.
+# # How to do that
+# # https://docs.docker.com/engine/swarm/secrets/#using-secrets-in-compose-files
+
 WORKDIR /
 # Copy non-root user
 COPY --from=build /etc/passwd /etc/passwd
