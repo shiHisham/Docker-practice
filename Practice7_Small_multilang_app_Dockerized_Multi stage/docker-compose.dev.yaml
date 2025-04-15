@@ -1,0 +1,36 @@
+services:
+  api-golang:
+    build:
+      context: ./api-golang
+      target: dev
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./api-golang/.env
+    networks:
+      - MSSmall_app
+    depends_on:
+      - postgres
+
+  api-node:
+    build:
+      context: ./api-node
+      target: dev
+    ports:
+      - "3000:3000"
+    networks:
+      - MSSmall_app
+    depends_on:
+      - postgres
+
+  react:
+    build:
+      context: ./client-react
+      target: dev
+    ports:
+      - "1515:1516"
+    networks:
+      - MSSmall_app
+    depends_on:
+      - api-node
+      - api-golang

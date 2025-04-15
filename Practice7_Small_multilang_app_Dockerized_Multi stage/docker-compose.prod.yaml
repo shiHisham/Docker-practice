@@ -1,0 +1,40 @@
+services:
+  api-golang:
+    build:
+      context: ./api-golang
+      target: prod
+    ports:
+      - "8080:8080"
+    secrets:
+      - DATABASE_URL
+    networks:
+      - MSSmall_app
+    depends_on:
+      - postgres
+
+  api-node:
+    build:
+      context: ./api-node
+      target: prod
+    ports:
+      - "3000:3000"
+    networks:
+      - MSSmall_app
+    depends_on:
+      - postgres
+
+  react:
+    build:
+      context: ./client-react
+      target: prod
+    ports:
+      - "1515:1516"
+    networks:
+      - MSSmall_app
+    depends_on:
+      - api-node
+      - api-golang
+
+secrets:
+  DATABASE_URL:
+    file: ./secrets/DATABASE_URL.txt

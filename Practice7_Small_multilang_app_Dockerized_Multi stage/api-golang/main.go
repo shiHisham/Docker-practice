@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -9,16 +8,19 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"api-golang/database"
+	"strings"
 )
 
 func init() {
 	databaseUrl := os.Getenv("DATABASE_URL")
+
+	// If not set via env (dev), fallback to secret file (prod)
 	if databaseUrl == "" {
-		content, err := ioutil.ReadFile(os.Getenv("DATABASE_URL_FILE"))
+		content, err := os.ReadFile("/run/secrets/DATABASE_URL")
 		if err != nil {
 			log.Fatal(err)
 		}
-		databaseUrl = string(content)
+		databaseUrl = strings.TrimSpace(string(content))
 	}
 
 	errDB := database.InitDB(databaseUrl)

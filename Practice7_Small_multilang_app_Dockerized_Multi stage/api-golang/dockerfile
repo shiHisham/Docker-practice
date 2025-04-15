@@ -1,5 +1,4 @@
 # Use multi-stage builds to optimize the final image size and security
-
 # ----------------------------------------------------------- Stage 1: Create base image, use alpine for smaller size
 FROM golang:1.23-alpine AS base
 
@@ -29,7 +28,6 @@ COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     go mod download
-
 
 
 # ----------------------------------------------------------- Stage 2: Development stage
@@ -68,17 +66,10 @@ RUN go build -ldflags="-linkmode external -extldflags -static -s -w" -tags netgo
 # To use this stage, run the following command: docker build -t api-go-prod && docker run -it --rm api-go-prod
 # This stage is used for the final production image
 # Use scratch as the base image for a minimal image size and better security
-FROM scratch
+FROM scratch as prod
 # ENV GIN_MODE=release, which is used to set the Gin framework to release mode
 # This is important for performance and security in production
 ENV GIN_MODE=release
-# ENV DATABASE=postgres://user:password@host:port/dbname?sslmode=disable
-# # ENV DATABASE=postgres://user:password@host:port/dbname?sslmode=disable
-# # About security this approach of env and set database connection string is not recommended
-# # because it exposes sensitive information in the image. 
-# # A better approach would be to use Docker secrets or environment variables at runtime.
-# # How to do that
-# # https://docs.docker.com/engine/swarm/secrets/#using-secrets-in-compose-files
 
 WORKDIR /
 # Copy non-root user
