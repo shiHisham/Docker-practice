@@ -26,10 +26,11 @@ services:
     depends_on:
       - postgres
 
-  react:
+  api-react:
     build:
       context: ./client-react
       target: prod
+      dockerfile: dockerfile.prod
     ports:
       - "1515:1516"
     networks:

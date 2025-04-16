@@ -8,6 +8,9 @@ up-golang-only-dev:
 up-node-only-dev:
 	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build postgres api-node
 
+up-react-only-dev:
+	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build postgres api-react
+
 # Production
 up-prod:
 	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build -d
@@ -17,6 +20,9 @@ up-golang-only-prod:
 
 up-node-only-prod:
 	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build postgres api-node
+
+up-react-only-prod:
+	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build postgres api-react
 
 # Clean everything
 clean:
