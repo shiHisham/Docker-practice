@@ -4,8 +4,8 @@ const { Pool } = require('pg');
 
 databaseUrl =
   process.env.DATABASE_URL ||
-  fs.readFileSync(process.env.DATABASE_URL_FILE, 'utf8');
-
+  fs.readFileSync('/run/secrets/DATABASE_URL', 'utf8');
+  
 const pool = new Pool({
   connectionString: databaseUrl,
 });

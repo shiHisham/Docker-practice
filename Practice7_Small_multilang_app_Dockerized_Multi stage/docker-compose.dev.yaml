@@ -16,10 +16,13 @@ services:
     build:
       context: ./api-node
       target: dev
+      dockerfile: dockerfile
     ports:
       - "3000:3000"
     networks:
       - MSSmall_app
+    env_file:
+      - ./api-node/.env
     depends_on:
       - postgres
 

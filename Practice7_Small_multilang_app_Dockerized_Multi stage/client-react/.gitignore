@@ -1,3 +1,9 @@
+# React
+Makefile
+README.md
+Dockerfile
+.dockerignore
+
 # Logs
 logs
 *.log

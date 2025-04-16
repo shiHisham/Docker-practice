@@ -16,10 +16,13 @@ services:
     build:
       context: ./api-node
       target: prod
+      dockerfile: dockerfile.distroless
     ports:
       - "3000:3000"
     networks:
       - MSSmall_app
+    secrets:
+      - DATABASE_URL
     depends_on:
       - postgres
 
