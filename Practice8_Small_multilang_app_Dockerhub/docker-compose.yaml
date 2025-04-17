@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:alpine
+    networks:
+      - MSSmall_app
+    ports:
+      - "5432:5432"
+    secrets:
+      - POSTGRES_PASSWORD
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./entrypoint-postgres.sh:/entrypoint.sh
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    
+secrets:
+  POSTGRES_PASSWORD:
+    file: ./secrets/POSTGRES_PASSWORD.txt
+
+volumes:
+  pgdata:
+
+networks:
+  MSSmall_app:
