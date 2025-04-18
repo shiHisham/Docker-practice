@@ -1,30 +1,27 @@
-# Development environment
-up-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build
+.PHONY: build-scratch-image
+build-scratch-image:
+	docker build --tag myfirst-scratch-image .
 
-up-golang-only-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build -d postgres api-golang
+# Firstly build the image, and log in to dockerhub before running this target
+# https://docs.docker.com/engine/reference/commandline/login/
+.PHONY: push-dockerhub
+push-dockerhub:
+	docker tag myfirst-scratch-image hichamshih/myfirst-scratch-image # defaults to latest
+	docker push hichamshih/myfirst-scratch-image
 
-up-node-only-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build postgres api-node
+# tagging with a version number
 
-up-react-only-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build postgres api-react
+	docker tag myfirst-scratch-image hichamshih/myfirst-scratch-image:v1
+	docker push hichamshih/myfirst-scratch-image:v1
 
-# Production
-up-prod:
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build -d
+# Firstly build the image, and log in to github packages before running this target
+# https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry
 
-up-golang-only-prod:
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build -d postgres api-golang
+.PHONY: push-github-packages
+push-github-packages:
+	docker tag myfirst-scratch-image ghcr.io/shihisham/myfirst-scratch-image # defaults to latest
+	docker push ghcr.io/shihisham/myfirst-scratch-image
 
-up-node-only-prod:
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build postgres api-node
-
-up-react-only-prod:
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build postgres api-react
-
-# Clean everything
-clean:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml down -v
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml down -v
+# tagging with a version number
+	docker tag myfirst-scratch-image ghcr.io/shihisham/myfirst-scratch-image:v1 # defaults to latest
+	docker push ghcr.io/shihisham/myfirst-scratch-image:v1

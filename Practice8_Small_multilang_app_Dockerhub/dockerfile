@@ -1,0 +1,2 @@
+# Create scratch image for testing docker hub push and github (ghcr.io) push
+FROM scratch

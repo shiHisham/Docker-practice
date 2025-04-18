@@ -1,115 +1,50 @@
-# 🛠 Full Stack Dockerized Microservices App
+# Docker Image Push Practice – Docker Hub & GitHub Packages
 
-A complete setup for a small full-stack microservices app using **Go**, **Node.js**, **React**, and **PostgreSQL**, containerized with **Docker**. The stack is clean, optimized, and ready for both development and production use.
+This small project is a practice for building and pushing a Docker image to both Docker Hub and GitHub Container Registry (GHCR).
 
----
-
-## ⚙️ Stack Overview
-
-| Service      | Language / Tool | Description                       |
-|--------------|------------------|-----------------------------------|
-| `api-golang` | Go (Gin)         | Backend API #1                    |
-| `api-node`   | Node.js (Express)| Backend API #2                    |
-| `api-react`  | React + Vite     | Frontend (SPA)                    |
-| `postgres`   | PostgreSQL       | Shared database                   |
+The image is based on `scratch`, just to keep it minimal. The goal here is to make sure everything works end-to-end: building, tagging, authentication, and pushing to both registries.
 
 ---
 
-## 🧪 Development Environment
+## Steps I followed
 
-- Each service has its own multi-stage `Dockerfile` with a `dev` target.
-- React runs with Vite hot reload on port `1516`
-- Golang uses `air` for hot reload
-- Node uses `nodemon`
+### 1. Docker Hub
 
-> Services communicate using their **Docker Compose service name** (e.g. `api-node`, `api-golang`), not `localhost`.
+- Created a Docker Hub account
+- Logged in using the terminal: `docker login`
+- Built the image using a Makefile
+- Tagged and pushed the image to Docker Hub
 
-### Example Vite Proxy Setup:
-```js
-proxy: {
-  '/api-go': {
-    target: 'http://api-golang:8080',
-    rewrite: path => path.replace(/^\/api-go/, '')
-  },
-  '/api-node': {
-    target: 'http://api-node:3000',
-    rewrite: path => path.replace(/^\/api-node/, '')
-  }
-}
-```
+You can check the image on my Docker Hub profile:
+[https://hub.docker.com/u/hichamshih](https://hub.docker.com/u/hichamshih)
 
 ---
 
-## 🚀 Production Setup
+### 2. GitHub Packages (GHCR)
 
-- `api-golang`: golang image + `/run/secrets/DATABASE_URL`
-- `api-node`: distroless image + `/run/secrets/DATABASE_URL`
-- `api-react`: built with Vite, served via `nginxinc/nginx-unprivileged`
-- `postgres`: same container used for both environments
+- Created a personal access token (PAT) from GitHub with the following scopes:
+  - `write:packages`
+  - `read:packages`
+- Logged in to GitHub Container Registry using:
+  ```bash
+  echo ghp_xxxxxxxxxxxxxxxxxxxxxx | docker login ghcr.io -u shihisham --password-stdin
+  ```
+- Tagged and pushed the image to GHCR using the Makefile
 
-
-## 🔐 Secrets Management
-
-- Dev: uses `.env` + `env_file:` in Compose
-- Prod: uses Docker Swarm secrets (`/run/secrets/…`)
-
-Go example:
-```go
-os.Getenv("DATABASE_URL") // for dev
-os.ReadFile("/run/secrets/DATABASE_URL") // for prod
-```
-
-To create the secret:
-```bash
-docker secret create DATABASE_URL secrets/DATABASE_URL.txt
-```
+Once pushed, the image appears under the "Packages" tab on GitHub profile:
+[https://github.com/shihisham?tab=packages](https://github.com/shihisham?tab=packages)
 
 ---
 
-## 📦 Docker & Compose Highlights
+## Notes
 
-- Each service has its own `.dockerignore`
-- Multi-stage Dockerfiles
-- Clean separation of dev vs prod via `docker-compose.dev.yaml` & `docker-compose.prod.yaml`
-- Network aliasing via service names (e.g. `api-node`, `api-golang`)
-
----
-
-## 🛠 Makefile (Optional Shortcuts)
-
-```Makefile
-# Development environment
-up-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build
-up-golang-only-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build -d postgres api-golang
-up-node-only-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build postgres api-node
-up-react-only-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build postgres api-react
-
-# Production
-up-prod:
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build -d
-up-golang-only-prod:
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build -d postgres api-golang
-up-node-only-prod:
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build postgres api-node
-up-react-only-prod:
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build postgres api-react
-# Clean everything
-clean:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml down -v
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml down -v
-```
+- Makefile is used to automate build and push steps
+- Tags include both `latest` (default) and a custom version (`v1`)
+- This was mainly a practice for workflow testing, not an actual image for production use
 
 ---
 
-## ✅ Summary
+## Author
 
-This setup gives you:
-- 🔁 Hot reload in dev
-- 🔐 Secure secrets handling in prod
-- 🐳 Minimal, layered images
-- 🧠 Easy switching between dev/prod
-- 🌍 Networked services with DNS names
+**Hicham Shih**  
+[GitHub](https://github.com/shiHisham)
