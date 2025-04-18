@@ -1,6 +1,6 @@
-# Practice 5 - Small Multi-Language App (Partially Dockerized)
+# 🧪 Practice 5 - Small Multi-Language App (Partially Dockerized)
 
-## About This Practice
+## 📚 About This Practice
 
 This practice is based on a project from [DevOps Directive Docker Course](https://github.com/sidpalas/devops-directive-docker-course/tree/main/05-example-web-application).
 
@@ -11,47 +11,142 @@ It is a simple **3-tier web application** composed of:
 - **Golang API**: Backend API developed with Go.
 - **PostgreSQL Database**: A relational database.
 
-In this version, **only the PostgreSQL database** was Dockerized.  
-The frontend and backend services (React, Node.js, and Go) were launched **locally** on the host machine.
+> In this version, **only the PostgreSQL database** is Dockerized.  
+> The frontend and backend services (React, Node.js, and Go) are launched **locally** on the host machine.
 
 ---
 
-## Architecture
+## 🧩 Architecture
 
-- **Frontend** (React) ➔ communicates with ➔ **Node.js API** and **Golang API**
-- **APIs** ➔ fetch data from ➔ **PostgreSQL** (running inside Docker)
+```
+[ React Frontend ]
+        ↓
+[ Node.js API ] <--> [ Golang API ]
+        ↓                  ↓
+      [ PostgreSQL (Dockerized) ]
+```
+
+- **Frontend** (React) communicates with both **Node.js API** and **Golang API**
+- **APIs** fetch data from a shared **PostgreSQL** instance running in Docker
 
 ---
 
-## Technologies Used
+## ⚙️ Technologies Used
 
-- React
-- Node.js
+- React (Vite)
+- Node.js (Express.js)
 - Golang
 - PostgreSQL (Dockerized)
+- Makefile (for running services)
 
 ---
 
-## How to Run the Project (Practice 5)
+## 🏃‍♂️ How to Run the Project (Practice 5)
 
-1. **Start PostgreSQL in Docker:**
-   Follow Makefile instructions to run PostgreSQL in a Docker container. This will set up the database for the APIs to connect to.
+### 1. Start PostgreSQL in Docker
 
-2. **Run Node.js API:**
-   - Navigate to the `api-node` directory.
-   - Install dependencies using `npm install`.
-   - Start the API using `make run-api-node`.
+Use the Makefile command to launch a PostgreSQL container:
 
-3. **Run Golang API:**
-   - Navigate to the `api-golang` directory.
-   - Install dependencies using `go mod download`.
-   - Start the API using `make run-api-golang`.
+```bash
+make run-postgres
+```
 
-4. **Run React Frontend:**
-   - Navigate to the `client-react` directory.
-   - Install dependencies using `npm install`.
-   - Start the frontend using `make run-client-react`.
+This sets up the PostgreSQL database with the following values:
+- `POSTGRES_PASSWORD=foobarbaz`
+- Volume: `pgdata:/var/lib/postgresql/data`
+- Port: `5432`
 
-5. **Access the Application:**
-   - Open your web browser and navigate to `http://localhost:3000` to access the React frontend.
-    - The frontend will communicate with the Node.js and Golang APIs to fetch data from the PostgreSQL database.
+### 2. Run the Node.js API
+
+```bash
+make run-api-node
+```
+
+This will:
+- Navigate to the `api-node` directory
+- Start the development server with the correct `DATABASE_URL`
+- Run this command if you have error with `nvm` or `npm`:
+```bash
+nvm ls
+nvm use node 19.4
+npm install
+npm run dev
+```
+To install the dependencies and start the Node.js API server.
+
+### 3. Run the Golang API
+
+```bash
+make run-api-golang
+```
+
+This will:
+- Navigate to the `api-golang` directory
+- Run the Go API server
+- Run this command if you have error with `go run`:
+```bash
+mkdir go-workspace
+export GOPATH=$PWD/go-workspace
+go mod download
+go run main.go
+```
+To download the dependencies and start the Golang API server.
+
+### 4. Run the React Frontend
+
+```bash
+make run-client-react
+```
+
+This will:
+- Navigate to the `client-react` directory
+- Start the Vite development server
+
+---
+
+## 🌍 Access the Application
+
+Once all services are running, open your browser:
+
+```
+http://localhost:3000
+```
+
+The React frontend will:
+- Fetch data from both Node.js and Golang APIs
+- Both APIs will fetch their data from the shared PostgreSQL container
+
+---
+
+## 📂 File Highlights
+
+Here’s a preview of key Makefile commands:
+
+```makefile
+DATABASE_URL:=postgres://postgres:foobarbaz@localhost:5432/postgres
+
+run-postgres:
+	docker run -e POSTGRES_PASSWORD=foobarbaz \
+	-v pgdata:/var/lib/postgresql/data \
+	-p 5432:5432 postgres:15.1-alpine
+
+run-api-node:
+	cd api-node && DATABASE_URL=${DATABASE_URL} npm run dev
+
+run-api-golang:
+	cd api-golang && DATABASE_URL=${DATABASE_URL} go run main.go
+
+run-client-react:
+	cd client-react && npm run dev
+```
+
+---
+
+## 🧠 What This Practice Covers
+
+- Multi-language project structure and collaboration between services
+- Running only the database in Docker while developing other services locally
+- Managing and reusing environment variables across services
+- Using a `Makefile` to simplify development workflow
+
+---
