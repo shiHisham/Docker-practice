@@ -105,11 +105,6 @@ os.Getenv("DATABASE_URL")
 os.ReadFile("/run/secrets/DATABASE_URL")
 ```
 
-### Create a Secret:
-```bash
-docker secret create DATABASE_URL secrets/DATABASE_URL.txt
-```
-
 > Apps use fallback logic to detect their current environment.
 
 ---
