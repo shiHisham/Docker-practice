@@ -10,7 +10,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  node:
+  api-node:
     build: ./api-node
     ports:
       - "3000:3000"
@@ -19,7 +19,7 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:foobarbaz@db:5432/postgres
 
-  golang:
+  api-golang:
     build: ./api-golang
     ports:
       - "8080:8080"
@@ -33,8 +33,8 @@ services:
     ports:
       - "1515:1516"
     depends_on:
-      - node
-      - golang
+      - api-node
+      - api-golang
       
 volumes:
   pgdata:

@@ -8,15 +8,16 @@ dns.setDefaultResultOrder('verbatim');
 export default defineConfig({
   plugins: [react()],
   server: {
+    port: 1516,
     proxy: {
       '/api/golang': {
-        target: 'http://localhost:8080',
+        target: 'http://api-golang:8080',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/golang/, ''),
         secure: false,
       },
       '/api/node': {
-        target: 'http://localhost:3000',
+        target: 'http://api-node:3000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/node/, ''),
         secure: false,
