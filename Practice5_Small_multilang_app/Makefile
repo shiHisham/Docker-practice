@@ -21,7 +21,8 @@ run-api-golang:
 	@echo Starting golang api
 	cd api-golang && \
 		DATABASE_URL=${DATABASE_URL} \
-		go run main.go
+		GOARCH=amd64 go run main.go 
+# 	GOARCH=amd64 is needed to run the golang api on 64-bit architecture
 
 .PHONY: run-client-react
 run-client-react:

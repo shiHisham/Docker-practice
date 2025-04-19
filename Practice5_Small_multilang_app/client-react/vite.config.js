@@ -8,6 +8,7 @@ dns.setDefaultResultOrder('verbatim');
 export default defineConfig({
   plugins: [react()],
   server: {
+    port: 1515,
     proxy: {
       '/api/golang': {
         target: 'http://localhost:8080',

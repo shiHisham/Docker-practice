@@ -109,7 +109,7 @@ This will:
 Once all services are running, open your browser:
 
 ```
-http://localhost:3000
+http://localhost:1515
 ```
 
 The React frontend will:
