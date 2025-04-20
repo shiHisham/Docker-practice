@@ -136,3 +136,8 @@ Each service has its own `Dockerfile` and runs in isolation while sharing the sa
 Project based on the example from [DevOps Directive Docker Course](https://github.com/sidpalas/devops-directive-docker-course/tree/main/05-example-web-application).
 
 ---
+
+
+---
+
+🧾 *README content written based on my own implementation and learning. Formatting and structure assisted by ChatGPT for clarity and presentation.*

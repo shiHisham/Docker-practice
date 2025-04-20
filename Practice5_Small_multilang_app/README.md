@@ -150,3 +150,7 @@ run-client-react:
 - Using a `Makefile` to simplify development workflow
 
 ---
+
+---
+
+🧾 *README content written based on my own implementation and learning. Formatting and structure assisted by ChatGPT for clarity and presentation.*

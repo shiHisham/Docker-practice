@@ -66,3 +66,7 @@ The inserted data was successfully retained across container restarts because it
 - Safe teardown and re-creation of stateful services
 
 ---
+
+---
+
+🧾 *README content written based on my own implementation and learning. Formatting and structure assisted by ChatGPT for clarity and presentation.*

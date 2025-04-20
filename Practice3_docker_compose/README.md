@@ -53,3 +53,8 @@ Successfully connected to the database!
 - Service-to-service communication using Docker Compose network
 
 ---
+
+
+---
+
+🧾 *README content written based on my own implementation and learning. Formatting and structure assisted by ChatGPT for clarity and presentation.*

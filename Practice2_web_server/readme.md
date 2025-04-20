@@ -40,3 +40,7 @@ Hello from Dockerized Web Server! using flask Framework 👋
 - Serving HTTP content from a Flask app
 
 ---
+
+---
+
+🧾 *README content written based on my own implementation and learning. Formatting and structure assisted by ChatGPT for clarity and presentation.*
