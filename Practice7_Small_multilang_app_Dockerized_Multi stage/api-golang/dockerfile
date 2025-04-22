@@ -56,9 +56,9 @@ RUN adduser -D -u 1001 nonroot
 # Copy the application files into the container
 COPY . .
 # Build healthcheck binary
-RUN go build -ldflags="-linkmode external -extldflags -static -s -w" -tags netgo -o healthcheck ./healthcheck/healthcheck.go
+RUN go build -ldflags="-linkmode external -extldflags -static" -tags netgo -o healthcheck ./healthcheck/healthcheck.go
 # Build application binary
-RUN go build -ldflags="-linkmode external -extldflags -static -s -w" -tags netgo -o api-golang
+RUN go build -ldflags="-linkmode external -extldflags -static" -tags netgo -o api-golang
 
 
 
@@ -75,7 +75,7 @@ WORKDIR /
 # Copy non-root user
 COPY --from=build /etc/passwd /etc/passwd
 # Copy built binaries
-COPY --from=build /app/healthcheck healthcheck
+COPY --from=build /app/healthcheck/healthcheck healthcheck
 COPY --from=build /app/api-golang api-golang
 # Add non-root user to the image, this is important for security reasons
 USER nonroot

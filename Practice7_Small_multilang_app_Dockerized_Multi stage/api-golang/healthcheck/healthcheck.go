@@ -19,7 +19,7 @@ func main() {
 		Timeout: 2 * time.Second,
 	}
 
-	resp, err := client.Get("http://localhost:" + port + "/ping")
+	resp, err := client.Get("http://0.0.0.0:" + port + "/ping")
 	if err != nil {
 		log.Fatal(err)
 	}

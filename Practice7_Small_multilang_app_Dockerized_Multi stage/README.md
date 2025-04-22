@@ -1,11 +1,11 @@
-# 🧪 Practice 7 - Full Stack Multi-Language Microservices App  
-### 🐳 Fully Dockerized · Multi-Stage Builds · Dev/Prod Separation · Secrets · Makefile Automation
+# 🧪 Practice 7 - Full Stack Multi-Language Microservices App
+### 🐋 Fully Dockerized · Multi-Stage Builds · Dev/Prod Separation · Secrets · Makefile Automation · Healthchecks + Auto-Restart
 
 ---
 
-## 📚 Overview
+## 📙 Overview
 
-This project is a refined version of [Practice 6](../Practice6_Small_multilang_app_Dockerized), evolving the same small multi-language, 3-tier application into a **secure, optimized, production-ready stack** using Docker best practices. It includes:
+This project builds on [Practice 6](../Practice6_Small_multilang_app_Dockerized), evolving the same multi-language, 3-tier application into a secure, production-ready stack.
 
 - 🏗️ Multi-stage Docker builds  
 - 🔐 Secure container images (Distroless, Scratch)  
@@ -14,8 +14,19 @@ This project is a refined version of [Practice 6](../Practice6_Small_multilang_a
 - 🔑 Secrets management using `.env` and Docker secrets  
 - 📦 Minimal image sizes, non-root containers, and custom networking  
 - 🧾 Full Makefile automation  
+- 🔍 Healthcheck integration for auto-restart and monitoring
 
 This stack is ideal for both learning and production-like deployments.
+
+### ✨ New in Practice 7:
+- ✅ Production healthchecks for all services
+- ✅ Auto-restart on failure using `restart: unless-stopped`
+- ✅ Diagnostic testing of health behavior
+- ✅ Better loopback handling inside containers (`127.0.0.1` instead of `localhost`)
+- ✅ Watch command for container status in Makefile
+- ✅ Refined permission handling in Dockerfiles for reliable testing
+
+This setup reflects **how real-world Dockerized microservices are structured and monitored.**
 
 ---
 
@@ -32,7 +43,7 @@ All services are fully containerized, networked, and managed with Docker Compose
 
 ---
 
-## 🧩 Architecture & Communication
+## 🪩 Architecture & Communication
 
 - Each service runs in its own container.
 - A custom Docker network `MSSmall_app` enables internal communication via service names.
@@ -54,9 +65,9 @@ proxy: {
 
 ---
 
-## 🧪 Development Environment
+## 🧪 Development Setup
 
-- Each service has its own multi-stage `Dockerfile` with a `dev` target.
+ Each service has its own multi-stage `Dockerfile` with a `dev` target.
 - React uses Vite hot reload on port `1516`
 - Golang uses [`air`](https://github.com/cosmtrek/air) for hot reload
 - Node.js uses `nodemon`
@@ -72,101 +83,107 @@ proxy: {
 - **Secrets** are injected via `/run/secrets/...` from Docker.
 - **Images are minimal**:
   - `api-golang`: `scratch`
-  - `api-node`: `distroless`
+  - `api-node`: `distroless` replaced with `node:alpine` for CLI access no longer `distroless` in this new version
   - `api-react`: built static site served via `nginxinc/nginx-unprivileged`
 - PostgreSQL runs the same image in both dev and prod, with a custom entrypoint script for secret injection.
-
+- Healthcheck endpoints or binaries used to detect readiness
+- `restart: unless-stopped` for resilience
 ---
 
-## 📉 Docker Image Size Comparison
+## 📊 Docker Image Size Comparison
 
 | Service        | Practice 6 Size | Practice 7 Size | Reduction          |
 |----------------|------------------|------------------|---------------------|
 | React Frontend | 290MB            | 41.3MB           | ✅ ~85% smaller      |
-| Node.js API    | 1.14GB           | 167MB            | ✅ ~85% smaller      |
+| Node.js API    | 1.14GB           | 170.68MB         | ✅ ~83% smaller      |
 | Golang API     | 978MB            | 16.2MB           | ✅ ~98% smaller      |
 | PostgreSQL     | 243MB            | 243MB            | ≈ Same               |
 
-> Achieved through multi-stage builds, production-only dependencies, and lean base images.
+---
+
+## 🔐 Secrets & Environment Handling
+
+- **Dev**: `.env` + `env_file:` in Compose
+- **Prod**: `Docker secrets` via mounted files and entrypoint scripts for PostgreSQL
+- **Secrets** are injected into containers at runtime, not hardcoded in images.
+- All backend apps support fallback logic for secret loading
 
 ---
 
-## 🔐 Secrets & Environment Management
+## 📊 Healthcheck Integration (New)
 
-- **Development** uses `.env` files and `env_file:` in Compose.
-- **Production** uses Docker secrets securely mounted at runtime.
+### How It Works:
+- Custom endpoints `/ping` created in Go, Node, and React (via Nginx)
+- Healthchecks use `wget` or binary probes on `127.0.0.1` instead of `localhost`, because `localhost` resolves to the container's own DNS, which can cause issues.
+- Docker tracks container health using this data
 
-### Example: Golang Secret Handling (./api-golang/main.go)
-```go
-// Dev
-os.Getenv("DATABASE_URL")
-
-// Prod
-os.ReadFile("/run/secrets/DATABASE_URL")
+### Example: Compose entry
+```yaml
+restart: unless-stopped
+healthcheck:
+  test: ["CMD", "wget", "--spider", "--quiet", "http://127.0.0.1:1516"]
+  interval: 10s
+  timeout: 5s
+  retries: 3
+  start_period: 10s
 ```
 
-> Apps use fallback logic to detect their current environment.
+### Key Fix:
+> Replacing `localhost` with `127.0.0.1` was necessary in healthcheck scripts to avoid container DNS issues.
+
+### Confirmed Results:
+- Container correctly reports `healthy`
+- Manual crash (e.g., `kill 1`) causes auto-restart
+- Healthcheck failures alone do **not** trigger restarts (Docker behavior) unless the container crashes or exits.
 
 ---
 
-## 🧾 Makefile Automation
-
-A custom `Makefile` simplifies local development, production setup, and cleaning:
+## 📃 Makefile Automation
 
 ```makefile
-# Development
-up-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build
-up-golang-only-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build -d postgres api-golang
-up-node-only-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build postgres api-node
-up-react-only-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build postgres api-react
-
-# Production
-up-prod:
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build -d
-up-golang-only-prod:
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build -d postgres api-golang
-up-node-only-prod:
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build postgres api-node
-up-react-only-prod:
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build postgres api-react
-
-# Clean
-clean:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml down -v
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml down -v
+# Monitor container status like 'watch'
+watch:
+	while true; do clear; docker ps; sleep 3; done
 ```
 
+Includes:
+- Dev commands (`up-dev`, `up-react-only-dev`, etc.)
+- Prod commands (`up-prod`, `up-react-only-prod`, etc.)
+- Make clean for removing all containers, images, and volumes
+- Watch command for monitoring container status using `make watch`
 ---
 
-## 🧠 What This Practice Demonstrates
+## 🧰 Lessons, Fixes & Gotchas
 
-- Real-world microservices architecture with frontend/backend/db layers
-- Secure, minimal Docker images using multi-stage builds
-- Clean and consistent dev/prod environment separation
-- Automated workflows using Makefile
-- Safe secret injection with Docker secrets
-- Multi-container orchestration with Docker Compose
-- Custom networking and DNS-based communication
-
----
-
-## ✅ Why This Setup Matters
-
-This project isn't just a Docker tutorial — it’s a **blueprint for professional-grade full-stack app deployment**:
-
-- 🔐 Secure by default (non-root, secrets, minimal images)
-- 🧱 Modular and scalable architecture
-- 🧪 Dev-friendly with live reload and isolated services
-- 🚀 Prod-ready with optimized builds and secret handling
-- 🔄 Easy to extend with CI/CD, reverse proxies (Nginx, Traefik), or orchestration (Kubernetes, ECS)
+| Challenge                            | Fix / Learning Outcome                                     |
+|-------------------------------------|-------------------------------------------------------------|
+| Healthcheck failed on `localhost`   | Used `127.0.0.1` to avoid internal container DNS issues     |
+| React healthcheck failing silently  | Nginx wasn't exposing port in config, verified via `netstat`|
+| `distroless` too minimal             | Switched to `node:alpine` to allow CLI testing & access     |
+| Deleting code didn't crash the app  | Node kept code in memory — crash needs to kill PID 1       |
+| `restart: unless-stopped` confusion | Only restarts on actual exit/crash, not healthcheck alone   |
+| `mv` failed in container            | Files owned by root, container user was `node`              |
 
 ---
 
+## 💡 What This Practice Demonstrates
+
+- 🌍 Realistic multi-language, multi-service architecture
+- 🔧 Secure and optimized Docker builds
+- 🔎 Secrets management best practices
+- 🪡 Healthcheck and restart integration
+- ⚖️ Permission and ownership awareness in builds
+- 📈 Monitoring and debugging strategy using `docker ps`, logs, and simulated failures
 
 ---
 
-🧾 *README content written based on my own implementation and learning. Formatting and structure assisted by ChatGPT for clarity and presentation.*
+## ✅ Final Summary
+
+This practice has gone beyond simple containerization into **operational robustness**:
+- Services report their health
+- Crashes auto-recover
+- Production is monitored and stable
+
+---
+
+🗏️ *README content based on actual project implementation and testing. Format and documentation assisted by ChatGPT for clarity and completeness.*
