@@ -28,13 +28,13 @@ jobs:
     # Build Docker Images
     # ----------------------
     - name: 🧪 Build Golang API
-      run: docker build -f Practice9_CICD_GitHubActions_FullStack/api-golang/dockerfile -t test-golang test-golang Practice9_CICD_GitHubActions_FullStack/api-golang
+      run: docker build -f Practice9_CICD_GitHubActions_FullStack/api-golang/dockerfile -t test-golang Practice9_CICD_GitHubActions_FullStack/api-golang
 
     - name: 🧪 Build Node API
-      run: docker build -f Practice9_CICD_GitHubActions_FullStack/api-node/dockerfile -t test-node test-golang Practice9_CICD_GitHubActions_FullStack/api-node
+      run: docker build -f Practice9_CICD_GitHubActions_FullStack/api-node/dockerfile -t test-node Practice9_CICD_GitHubActions_FullStack/api-node
 
     - name: 🧪 Build React Frontend
-      run: docker build -f Practice9_CICD_GitHubActions_FullStack/client-react/dockerfile.dev -t test-react test-golang Practice9_CICD_GitHubActions_FullStack/client-react
+      run: docker build -f Practice9_CICD_GitHubActions_FullStack/client-react/dockerfile.dev -t test-react Practice9_CICD_GitHubActions_FullStack/client-react
 
     # ----------------------
     # Run Unit Tests
