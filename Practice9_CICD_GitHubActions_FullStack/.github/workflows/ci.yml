@@ -1,0 +1,28 @@
+name: CI - Build All Services
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code from repo
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build API Golang
+      run: docker build -f api-golang/dockerfile -t test-golang ./api-golang
+
+    - name: Build API Node
+      run: docker build -f api-node/dockerfile -t test-node ./api-node
+
+    - name: Build React Frontend
+      run: docker build -f client-react/dockerfile.dev -t test-react ./client-react
