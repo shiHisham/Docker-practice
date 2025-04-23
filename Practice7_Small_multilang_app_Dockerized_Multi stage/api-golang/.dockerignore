@@ -1,12 +1,1 @@
-Makefile
-README.md
-Dockerfile*
-node_modules
-npm-debug.log
-Dockerfile
-.dockerignore
 .env
-.env.*
-.git
-.gitignore
-.vscode
