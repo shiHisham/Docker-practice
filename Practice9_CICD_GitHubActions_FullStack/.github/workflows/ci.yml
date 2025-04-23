@@ -1,4 +1,4 @@
-name: CI - Build All Services
+name: CI/CD - Fullstack Docker App
 
 on:
   push:
@@ -12,17 +12,40 @@ jobs:
     timeout-minutes: 10
 
     steps:
-    - name: Checkout code from repo
+    - name: 📦 Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Docker Buildx
+    - name: 🐳 Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
-    - name: Build API Golang
+    # ----------------------
+    # Build Docker Images
+    # ----------------------
+    - name: 🧪 Build Golang API
       run: docker build -f api-golang/dockerfile -t test-golang ./api-golang
 
-    - name: Build API Node
+    - name: 🧪 Build Node API
       run: docker build -f api-node/dockerfile -t test-node ./api-node
 
-    - name: Build React Frontend
+    - name: 🧪 Build React Frontend
       run: docker build -f client-react/dockerfile.dev -t test-react ./client-react
+
+    # ----------------------
+    # Run Unit Tests
+    # ----------------------
+    - name: 🧪 Run Golang tests
+      run: |
+        cd api-golang
+        go test ./...
+
+    - name: 🧪 Run Node.js tests with Jest
+      run: |
+        cd api-node
+        npm install
+        npm test
+
+    - name: 🧪 Build React frontend
+      run: |
+        cd client-react
+        npm install
+        npm run build
