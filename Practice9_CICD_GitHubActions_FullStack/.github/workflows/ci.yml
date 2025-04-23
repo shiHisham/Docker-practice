@@ -49,3 +49,29 @@ jobs:
         cd client-react
         npm install
         npm run build
+
+  push:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📦 Checkout code
+      uses: actions/checkout@v3
+
+    - name: 🔐 Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: 🐳 Build and push Golang image
+      run: |
+        docker build -f api-golang/dockerfile -t hichamshih/practice9-api-golang:latest ./api-golang
+        docker push hichamshih/practice9-api-golang:latest
+
+    - name: 🐳 Build and push Node image
+      run: |
+        docker build -f api-node/dockerfile -t hichamshih/practice9-api-node:latest ./api-node
+        docker push hichamshih/practice9-api-node:latest
+
+    - name: 🐳 Build and push React image
+      run: |
+        docker build -f client-react/dockerfile.prod -t hichamshih/practice9-api-react:latest ./client-react
+        docker push hichamshih/practice9-api-react:latest
