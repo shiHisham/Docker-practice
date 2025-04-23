@@ -1,0 +1,67 @@
+services:
+  api-golang:
+    build:
+      context: ./api-golang
+      target: prod
+    ports:
+      - "8080:8080"
+    secrets:
+      - DATABASE_URL
+    networks:
+      - MSSmall_app
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  api-node:
+    build:
+      context: ./api-node
+      target: prod
+      dockerfile: dockerfile.distroless
+    ports:
+      - "3000:3000"
+    networks:
+      - MSSmall_app
+    secrets:
+      - DATABASE_URL
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  api-react:
+    build:
+      context: ./client-react
+      target: prod
+      dockerfile: dockerfile.prod
+    ports:
+      - "1515:1516"
+    networks:
+      - MSSmall_app
+    depends_on:
+      - api-node
+      - api-golang
+    # Add restart policy to ensure the container restarts on failure
+    restart: unless-stopped
+    # Add healthcheck to ensure the container is healthy before routing traffic to it
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://127.0.0.1:1516"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+secrets:
+  DATABASE_URL:
+    file: ./secrets/DATABASE_URL.txt

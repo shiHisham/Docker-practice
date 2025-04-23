@@ -1,0 +1,35 @@
+# Use multi-stage builds to optimize the final image size and security using Distroless for production
+# ----------------------------------------------------------- Stage 1: Create base image, use alpine for smaller size
+FROM node:23-alpine AS build
+WORKDIR /usr/src/app
+# Copy package files and install prod deps only
+COPY package.json package-lock.json ./
+RUN npm ci --only=production
+# Copy app source files
+COPY ./src .
+COPY ./healthcheck .
+
+
+
+
+# ----------------------------------------------------------- Stage 2: production stage
+# FROM gcr.io/distroless/nodejs:18 as prod
+FROM build as prod
+# Set environment variables for production
+ENV NODE_ENV production
+
+RUN --mount=type=cache,target=/usr/src/app/.npm \
+  npm set cache /usr/src/app/.npm && \
+  npm ci --only=production
+
+# Use non-root user for security
+USER node
+# Use --chown on COPY commands to set file permissions
+# Copy healthcheck script to .
+COPY --chown=node:node ./healthcheck/ .
+# Copy app from build stage
+COPY --chown=node:node ./src/ .
+# Expose your app port
+EXPOSE 3000
+# Start the app
+CMD ["node", "index.js"]
