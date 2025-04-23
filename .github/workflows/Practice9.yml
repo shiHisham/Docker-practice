@@ -28,13 +28,13 @@ jobs:
     # Build Docker Images
     # ----------------------
     - name: 🧪 Build Golang API
-      run: docker build -f Practice9_CICD_GitHubActions_FullStack/api-golang/dockerfile -t test-golang ./api-golang
+      run: docker build -f Practice9_CICD_GitHubActions_FullStack/api-golang/dockerfile -t test-golang test-golang Practice9_CICD_GitHubActions_FullStack/api-golang
 
     - name: 🧪 Build Node API
-      run: docker build -f Practice9_CICD_GitHubActions_FullStack/api-node/dockerfile -t test-node ./api-node
+      run: docker build -f Practice9_CICD_GitHubActions_FullStack/api-node/dockerfile -t test-node test-golang Practice9_CICD_GitHubActions_FullStack/api-node
 
     - name: 🧪 Build React Frontend
-      run: docker build -f Practice9_CICD_GitHubActions_FullStack/client-react/dockerfile.dev -t test-react ./client-react
+      run: docker build -f Practice9_CICD_GitHubActions_FullStack/client-react/dockerfile.dev -t test-react test-golang Practice9_CICD_GitHubActions_FullStack/client-react
 
     # ----------------------
     # Run Unit Tests
@@ -69,15 +69,15 @@ jobs:
 
     - name: 🐳 Build and push Golang image
       run: |
-        docker build -f Practice9_CICD_GitHubActions_FullStack/api-golang/dockerfile -t hichamshih/practice9-api-golang:latest ./api-golang
+        docker build -f Practice9_CICD_GitHubActions_FullStack/api-golang/dockerfile -t hichamshih/practice9-api-golang:latest Practice9_CICD_GitHubActions_FullStack/api-golang
         docker push hichamshih/practice9-api-golang:latest
 
     - name: 🐳 Build and push Node image
       run: |
-        docker build -f Practice9_CICD_GitHubActions_FullStack/api-node/dockerfile -t hichamshih/practice9-api-node:latest ./api-node
+        docker build -f Practice9_CICD_GitHubActions_FullStack/api-node/dockerfile -t hichamshih/practice9-api-node:latest Practice9_CICD_GitHubActions_FullStack/api-node
         docker push hichamshih/practice9-api-node:latest
 
     - name: 🐳 Build and push React image
       run: |
-        docker build -f Practice9_CICD_GitHubActions_FullStack/client-react/dockerfile.prod -t hichamshih/practice9-api-react:latest ./client-react
+        docker build -f Practice9_CICD_GitHubActions_FullStack/client-react/dockerfile.prod -t hichamshih/practice9-api-react:latest Practice9_CICD_GitHubActions_FullStack/client-react
         docker push hichamshih/practice9-api-react:latest
