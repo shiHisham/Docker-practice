@@ -3,8 +3,14 @@ name: CI/CD - Fullstack Docker App
 on:
   push:
     branches: [main]
+    paths:
+      - 'Practice9/**'
+      - '.github/workflows/ci.yml'
   pull_request:
     branches: [main]
+    paths:
+      - 'Practice9/**'
+      - '.github/workflows/ci.yml'
 
 jobs:
   build:
