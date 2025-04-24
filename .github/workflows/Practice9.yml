@@ -93,17 +93,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 📦 Checkout code
+    - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: 🔐 Log in to Docker Hub
+    - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    - name: 🏷️ Set TAG variable
+    - name: Set TAG variable
       id: vars
-      run: echo "TAG=sha-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      run: |
+        echo "SHA_TAG=sha-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        echo "DATE_TAG=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-    - name: 🐳 Build and push Golang image
+    - name: Build and push Golang image
       run: |
         docker build -f Practice9_CICD_GitHubActions_FullStack/api-golang/dockerfile \
           -t hichamshih/practice9-api-golang:latest \
@@ -114,7 +116,7 @@ jobs:
         docker push hichamshih/practice9-api-golang:${{ env.TAG }}
         docker push hichamshih/practice9-api-golang:${{ env.DATE_TAG }}
 
-    - name: 🐳 Build and push Node image
+    - name: Build and push Node image
       run: |
         docker build -f Practice9_CICD_GitHubActions_FullStack/api-node/dockerfile \
           -t hichamshih/practice9-api-node:latest \
@@ -125,7 +127,7 @@ jobs:
         docker push hichamshih/practice9-api-node:${{ env.TAG }}
         docker push hichamshih/practice9-api-node:${{ env.DATE_TAG }}
 
-    - name: 🐳 Build and push React image
+    - name: Build and push React image
       run: |
         docker build -f Practice9_CICD_GitHubActions_FullStack/client-react/dockerfile.prod \
           -t hichamshih/practice9-api-react:latest \
