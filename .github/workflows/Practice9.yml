@@ -56,6 +56,38 @@ jobs:
         npm install
         npm run build
 
+  # ----------------------
+  # Push Docker Images to Docker Hub
+  # ----------------------
+  # push:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #   - name: 📦 Checkout code
+  #     uses: actions/checkout@v3
+
+  #   - name: 🔐 Log in to Docker Hub
+  #     run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+  #   - name: 🐳 Build and push Golang image
+  #     run: |
+  #       docker build -f Practice9_CICD_GitHubActions_FullStack/api-golang/dockerfile -t hichamshih/practice9-api-golang:latest Practice9_CICD_GitHubActions_FullStack/api-golang
+  #       docker push hichamshih/practice9-api-golang:latest
+
+  #   - name: 🐳 Build and push Node image
+  #     run: |
+  #       docker build -f Practice9_CICD_GitHubActions_FullStack/api-node/dockerfile -t hichamshih/practice9-api-node:latest Practice9_CICD_GitHubActions_FullStack/api-node
+  #       docker push hichamshih/practice9-api-node:latest
+
+  #   - name: 🐳 Build and push React image
+  #     run: |
+  #       docker build -f Practice9_CICD_GitHubActions_FullStack/client-react/dockerfile.prod -t hichamshih/practice9-api-react:latest Practice9_CICD_GitHubActions_FullStack/client-react
+  #       docker push hichamshih/practice9-api-react:latest
+
+  # ----------------------
+  # Push Docker Images to Docker Hub using tagging and versioning like sha-<commit_hash>, latest, and version(v1.0.0)
+  # ----------------------
   push:
     needs: build
     runs-on: ubuntu-latest
@@ -67,17 +99,39 @@ jobs:
     - name: 🔐 Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
+    - name: 🏷️ Set TAG variable
+      id: vars
+      run: echo "TAG=sha-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
     - name: 🐳 Build and push Golang image
       run: |
-        docker build -f Practice9_CICD_GitHubActions_FullStack/api-golang/dockerfile -t hichamshih/practice9-api-golang:latest Practice9_CICD_GitHubActions_FullStack/api-golang
+        docker build -f Practice9_CICD_GitHubActions_FullStack/api-golang/dockerfile \
+          -t hichamshih/practice9-api-golang:latest \
+          -t hichamshih/practice9-api-golang:${{ env.TAG }} \
+          -t hichamshih/practice9-api-golang:${{ env.DATE_TAG }} \
+          Practice9_CICD_GitHubActions_FullStack/api-golang
         docker push hichamshih/practice9-api-golang:latest
+        docker push hichamshih/practice9-api-golang:${{ env.TAG }}
+        docker push hichamshih/practice9-api-golang:${{ env.DATE_TAG }}
 
     - name: 🐳 Build and push Node image
       run: |
-        docker build -f Practice9_CICD_GitHubActions_FullStack/api-node/dockerfile -t hichamshih/practice9-api-node:latest Practice9_CICD_GitHubActions_FullStack/api-node
+        docker build -f Practice9_CICD_GitHubActions_FullStack/api-node/dockerfile \
+          -t hichamshih/practice9-api-node:latest \
+          -t hichamshih/practice9-api-node:${{ env.TAG }} \
+          -t hichamshih/practice9-api-node:${{ env.DATE_TAG }} \
+          Practice9_CICD_GitHubActions_FullStack/api-node
         docker push hichamshih/practice9-api-node:latest
+        docker push hichamshih/practice9-api-node:${{ env.TAG }}
+        docker push hichamshih/practice9-api-node:${{ env.DATE_TAG }}
 
     - name: 🐳 Build and push React image
       run: |
-        docker build -f Practice9_CICD_GitHubActions_FullStack/client-react/dockerfile.prod -t hichamshih/practice9-api-react:latest Practice9_CICD_GitHubActions_FullStack/client-react
+        docker build -f Practice9_CICD_GitHubActions_FullStack/client-react/dockerfile.prod \
+          -t hichamshih/practice9-api-react:latest \
+          -t hichamshih/practice9-api-react:${{ env.TAG }} \
+          -t hichamshih/practice9-api-react:${{ env.DATE_TAG }} \
+          Practice9_CICD_GitHubActions_FullStack/client-react
         docker push hichamshih/practice9-api-react:latest
+        docker push hichamshih/practice9-api-react:${{ env.TAG }}
+        docker push hichamshih/practice9-api-react:${{ env.DATE_TAG }}
