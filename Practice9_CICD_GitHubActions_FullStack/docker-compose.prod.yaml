@@ -77,8 +77,6 @@ services:
     networks:
       - MSSmall_app
 
-make up-prod
-
 secrets:
   DATABASE_URL:
     file: ./secrets/DATABASE_URL.txt
