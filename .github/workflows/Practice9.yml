@@ -99,7 +99,7 @@ jobs:
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    - name: Set TAG variable
+    - name: Set TAG variables
       id: vars
       run: |
         echo "SHA_TAG=sha-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
@@ -109,31 +109,31 @@ jobs:
       run: |
         docker build -f Practice9_CICD_GitHubActions_FullStack/api-golang/dockerfile \
           -t hichamshih/practice9-api-golang:latest \
-          -t hichamshih/practice9-api-golang:${{ env.TAG }} \
+          -t hichamshih/practice9-api-golang:${{ env.SHA_TAG }} \
           -t hichamshih/practice9-api-golang:${{ env.DATE_TAG }} \
           Practice9_CICD_GitHubActions_FullStack/api-golang
         docker push hichamshih/practice9-api-golang:latest
-        docker push hichamshih/practice9-api-golang:${{ env.TAG }}
+        docker push hichamshih/practice9-api-golang:${{ env.SHA_TAG }}
         docker push hichamshih/practice9-api-golang:${{ env.DATE_TAG }}
 
     - name: Build and push Node image
       run: |
         docker build -f Practice9_CICD_GitHubActions_FullStack/api-node/dockerfile \
           -t hichamshih/practice9-api-node:latest \
-          -t hichamshih/practice9-api-node:${{ env.TAG }} \
+          -t hichamshih/practice9-api-node:${{ env.SHA_TAG }} \
           -t hichamshih/practice9-api-node:${{ env.DATE_TAG }} \
           Practice9_CICD_GitHubActions_FullStack/api-node
         docker push hichamshih/practice9-api-node:latest
-        docker push hichamshih/practice9-api-node:${{ env.TAG }}
+        docker push hichamshih/practice9-api-node:${{ env.SHA_TAG }}
         docker push hichamshih/practice9-api-node:${{ env.DATE_TAG }}
 
     - name: Build and push React image
       run: |
         docker build -f Practice9_CICD_GitHubActions_FullStack/client-react/dockerfile.prod \
           -t hichamshih/practice9-api-react:latest \
-          -t hichamshih/practice9-api-react:${{ env.TAG }} \
+          -t hichamshih/practice9-api-react:${{ env.SHA_TAG }} \
           -t hichamshih/practice9-api-react:${{ env.DATE_TAG }} \
           Practice9_CICD_GitHubActions_FullStack/client-react
         docker push hichamshih/practice9-api-react:latest
-        docker push hichamshih/practice9-api-react:${{ env.TAG }}
+        docker push hichamshih/practice9-api-react:${{ env.SHA_TAG }}
         docker push hichamshih/practice9-api-react:${{ env.DATE_TAG }}
