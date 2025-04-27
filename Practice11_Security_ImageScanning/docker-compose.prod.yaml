@@ -8,7 +8,8 @@ services:
     secrets:
       - DATABASE_URL
     networks:
-      - MSSmall_app
+      - MSSmall_app_backend
+      - MSSmall_app_frontend
     depends_on:
       - postgres
     restart: unless-stopped
@@ -23,11 +24,12 @@ services:
     build:
       context: ./api-node
       target: prod
-      dockerfile: dockerfile.distroless
+      dockerfile: dockerfile
     ports:
       - "3000:3000"
     networks:
-      - MSSmall_app
+      - MSSmall_app_backend
+      - MSSmall_app_frontend
     secrets:
       - DATABASE_URL
     depends_on:
@@ -44,17 +46,15 @@ services:
     build:
       context: ./client-react
       target: prod
-      dockerfile: dockerfile.prod
+      dockerfile: dockerfile
     ports:
       - "1515:1516"
     networks:
-      - MSSmall_app
+      - MSSmall_app_frontend
     depends_on:
       - api-node
       - api-golang
-    # Add restart policy to ensure the container restarts on failure
     restart: unless-stopped
-    # Add healthcheck to ensure the container is healthy before routing traffic to it
     healthcheck:
       test: ["CMD", "wget", "--spider", "--quiet", "http://127.0.0.1:1516"]
       interval: 10s
@@ -75,8 +75,15 @@ services:
       - api-golang
       - api-react
     networks:
-      - MSSmall_app
+      - MSSmall_app_frontend
+    tmpfs:
+      - /tmp
 
 secrets:
   DATABASE_URL:
     file: ./secrets/DATABASE_URL.txt
+
+
+networks:
+  MSSmall_app_backend:
+  MSSmall_app_frontend:

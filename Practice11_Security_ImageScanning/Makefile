@@ -2,19 +2,6 @@
 watch:
 	while true; do clear; docker ps; sleep 3; done
 
-# Development environment
-up-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build -d
-
-up-golang-only-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build -d postgres api-golang
-
-up-node-only-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build -d postgres api-node
-
-up-react-only-dev:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build -d postgres api-react
-
 # Production
 up-prod:
 	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --build -d
@@ -30,5 +17,4 @@ up-react-only-prod:
 
 # Clean everything
 clean:
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml down -v
 	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml down -v

@@ -39,7 +39,7 @@ Reverse Proxy (Nginx w/ SSL)
 
 ## 🔐 SSL Certificate Setup
 
-We generated a **self-signed certificate** using OpenSSL:
+Generate a **self-signed certificate** using OpenSSL:
 
 ```bash
 openssl req -x509 -nodes -days 365 \

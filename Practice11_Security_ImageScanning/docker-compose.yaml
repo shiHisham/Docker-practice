@@ -2,7 +2,7 @@ services:
   postgres:
     image: postgres:15.1-alpine
     networks:
-      - MSSmall_app
+      - MSSmall_app_backend
     ports:
       - "5432:5432"
     secrets:
@@ -20,4 +20,4 @@ volumes:
   pgdata:
 
 networks:
-  MSSmall_app:
+  MSSmall_app_backend:

@@ -10,7 +10,7 @@ COPY package.json package-lock.json ./
 # Install production dependencies only using mount cache for faster builds
 RUN --mount=type=cache,target=/app/.npm \
     npm set cache /app/.npm && \
-    npm ci
+    npm ci && npm cache clean --force
 
 
 # Copy all project files (excluding ones in .dockerignore)
