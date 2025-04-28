@@ -1,20 +1,18 @@
 package main
 
 import (
-	"io/ioutil"
+	"api-golang/database"
 	"log"
 	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
-
-	"api-golang/database"
 )
 
 func init() {
 	databaseUrl := os.Getenv("DATABASE_URL")
 	if databaseUrl == "" {
-		content, err := ioutil.ReadFile(os.Getenv("DATABASE_URL_FILE"))
+		content, err := os.ReadFile(os.Getenv("DATABASE_URL_FILE"))
 		if err != nil {
 			log.Fatal(err)
 		}
